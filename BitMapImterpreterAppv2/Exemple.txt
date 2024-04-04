@@ -1,0 +1,156 @@
+==> command exemples
+
+NewIMG ImageName (sizex, sizey, loadfrom, path)
+
+ForXY ImageName as ValueX, ValueY
+	{if valuex == 10}
+		PXY = val,val,val
+	else
+		PXY = val,val,val ==> terminates with endxy
+endForXY
+
+ForVal (min, max) as ValueName
+	{do whatever with value} ==> terminates with endfor
+endForVal
+
+if falsevalue
+	{do here}
+else if value1 == value2
+	{do here}
+else
+	{do here}
+endIf
+
+Noise ImageName (StartX, StartY, endX, endY, Intensity)
+NoiseAlong  {same}
+
+Blur  {same}
+
+LuminosityInvert ImageName
+
+ColorShift ImageName (shift)
+
+ColorInvert
+
+SharpScale ImageName (Multiplier)
+
+value = GetRandomR (min, max, seed)  ==> seed optional
+
+SaveImage ImageName
+SaveImage ImageName (Path)
+
+SaveHistogram ImageName
+
+
+// comment
+
++ - * / % =			arithmetique
+& \ ^				boolean
+> < >= <= == !=		logic ==> for if statements only
+
+func FuncName
+
+endFunc
+
+Vfunc FuncName (Value)
+	{body here}
+endFunc
+
+Rfunc FuncName
+	return Value
+endFunc
+
+RVfunc FuncName ()
+	return Value
+endFunc
+
+value = NewFunc 
+value = NewFunc with input
+value = NewFunc with input input2
+
+NewFunc
+NewFunc with input
+NewFunc with input input2
+
+// to declare just put name and = to default value, string int bool float
+value = {S,I,B,F}
+
+//returns the type of as string
+TypeOf value
+
+
+==> how it operates
+
+discover functions
+discover variables
+check syntax
+
+
+start first line
+	check if is comment
+	check for new value
+	check for operation (if contains =) ==> same time as new value
+	check for For loops
+	check for if statements
+	check for user function
+	check for sysFunction (my own stuff) ==> includes creating a new image
+
+	when finiding a new value
+		create new value of the type of the default value ==>
+			if true/false bool
+			if contains . float
+			if numbers int
+			else string
+
+	when finding a For loop
+		if forxy
+			find image
+			create new variables for names after "as"
+			set pixel colors
+			check if ended
+				if yes dispose of the vars
+		if Forval
+			create new variable for name after "as"
+			check minmax
+			do loop
+			check if ended
+				if yes dispose of the vars
+
+		in for loops you can use "endFor" to end prematurely to the end of the current code block and restart the loop
+
+
+	when finding a Sysfunction
+		check if theres arguments attached to it ( check for a parentesis)
+			read arguments and parse them to background function
+		execute background function
+
+		throw error if theres an argument where there shouldnt be
+		throw error if nb of arguments isint right or type
+
+	when finding a operation
+		find the modified value
+		find operator
+		find modifier
+		modifie
+
+
+	there should only be one operation per line,
+	no semicolon to end line,
+	capital letters and spacing at the begining and end dosent matter (spaces in middle of words matter a lot),
+	parentesis and coma not required for the function calls
+
+
+
+things to check for
+
+cant accept to make an addition or anything else when initializing a variable, the [2] is the value of the variable
+only one operator per line
+variable name is only with letters
+cannot have comments on a line with other instructions
+all functions are declared at the end
+cannot declare a function in a function
+you must declare variables and use these said variables as parameters of functions
+
+==> to add?
+
+can put not only vars for functions with parameters?
