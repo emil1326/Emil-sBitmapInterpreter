@@ -35,11 +35,11 @@ namespace BitMapImterpreterAppv2
     {
         public static bool CheckSyntax(string[] Instructions)
         {
-            return false;
+            return true;
         }
         public static bool CheckSyntax(string Instructions)
         {
-            return false;
+            return true;
         }
 
         // gotta make sure that for loops dont repeat themseves after the full exectution ==> should work
@@ -80,9 +80,14 @@ namespace BitMapImterpreterAppv2
                     if (currline == "endxy") // might not work?
                         return true;
 
+                string[] Tcurr = currline.Split(" ");
+                string Res = "";
+                if (Tcurr.Length != 1)
+                    Res = Tcurr[1];
+
                 if (currline.StartsWith("//"))
                     break; // is comment
-                else if (currline.Split(" ")[1] == "=")
+                else if (Res == "=") //might be a problem
                     DoNewValue(currline); // is new value or updated value
                 else if (currline.StartsWith("forval"))
                     i = DoForLoops(i);
@@ -101,7 +106,9 @@ namespace BitMapImterpreterAppv2
             void DoNewValue(string currline)
             {
                 string[] Words = currline.Split(" ");
-                if (Vars.ContainsKey(Words[0]))
+                if (Words.Length >= 3 && Vars.ContainsKey(Words[0]))
+                    Vars[Words[0]] = ReturnVar(Words[2]);
+                else if (Vars.ContainsKey(Words[0]))
                     ModifyValue(currline);
                 else
                     Vars.Add(Words[0], ReturnVar(Words[2]));
@@ -127,7 +134,7 @@ namespace BitMapImterpreterAppv2
                     else if (OP == '*' || OP == '/' || OP == '%')
                         throw new Exception($"cant do {OP} on strings at {currline}");
                 }
-                else if (ReturnVar(Vars[Words[0]]).GetType() == typeof(int))
+                else if (ReturnVar(Vars[Words[0]].ToString()).GetType() == typeof(int))
                 {
                     int val1 = int.Parse(Words[2]);
                     int val2 = 0;
@@ -299,7 +306,7 @@ namespace BitMapImterpreterAppv2
 
                 Pixel P = new();
 
-                P.SetValues((byte)ReturnVar(words[2]), (byte)ReturnVar(words[2]), (byte)ReturnVar(words[2]));
+                P.SetValues((byte)ReturnVar(words[2]), (byte)ReturnVar(words[3]), (byte)ReturnVar(words[4]));
 
                 return P;
             }
@@ -308,7 +315,11 @@ namespace BitMapImterpreterAppv2
             {
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    string name = lines[i].Split(" ")[1];
+                    string name = "";
+                    string[] lineT = lines[i].Split(" ");
+                    if (!string.IsNullOrEmpty(lines[i]))
+                        if (lineT.Length != 1)
+                            name = lines[i].Split(" ")[1];
 
                     if (lines[i].StartsWith("func"))
                         Functions.Add(new(name, false, false, GetFunctionBody()));
@@ -353,6 +364,8 @@ namespace BitMapImterpreterAppv2
             void SysFunc(string currline) // need check that the function exist else its error in writing function name
             {
                 string[] words = currline.Split(" ");
+                if (string.IsNullOrEmpty(words[0]))
+                    return;
 
                 if (currline.StartsWith("newimg"))
                     NewIMG();
@@ -504,6 +517,9 @@ namespace BitMapImterpreterAppv2
 
             int FindUserFunctionByName(string Input)
             {
+                if (string.IsNullOrEmpty(Input))
+                    return -1;
+
                 string Fname = Input.Split(" ")[0]; //if called alone or sys func
                 int pos = Functions.FindIndex((F) => F.Name == Fname);
 
@@ -571,8 +587,8 @@ namespace BitMapImterpreterAppv2
 
                 string[] GetBody(int Currindex)
                 {
-
-                } 
+                    return null;
+                }
 
                 bool GetIsEquality(string w1, string w2, string op)
                 {
@@ -590,18 +606,21 @@ namespace BitMapImterpreterAppv2
             return true; //returns true to say it worked
         }
 
-        static object ReturnVar(string Input)
+        static object ReturnVar(object Input)
         {
-            if (Input == "true" || Input == "false")
-                return bool.Parse(Input);
+            Input ??= 0;
+            string inputStr = Input.ToString();
 
-            else if (float.TryParse(Input, out float floatValue))
+            if (inputStr == "true" || inputStr == "false")
+                return bool.Parse(inputStr);
+
+            else if (float.TryParse(inputStr, out float floatValue))
                 return floatValue;
 
-            else if (int.TryParse(Input, out int intValue))
+            else if (int.TryParse(inputStr, out int intValue))
                 return intValue;
 
-            return Input; //if string   
+            return inputStr; // if string
         }
     }
 
